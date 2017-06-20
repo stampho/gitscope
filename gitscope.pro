@@ -7,19 +7,12 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-SOURCES += main.cpp \
-    gitmanager.cpp \
-    commitdao.cpp \
-    commit.cpp \
-    commitmodel.cpp
-
-QML_FILES += main.qml
-
 macos: {
     INCLUDEPATH += /usr/local/include
     LIBS += /usr/local/lib/libgit2.dylib
 }
 
+linux: LIBS += -lgit2
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked deprecated (the exact warnings
@@ -27,11 +20,21 @@ macos: {
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
+SOURCES += \
+    commit.cpp \
+    commitdao.cpp \
+    commitmodel.cpp \
+    gitmanager.cpp \
+    main.cpp
+
 HEADERS += \
-    gitmanager.h \
-    commitdao.h \
     commit.h \
-    commitmodel.h
+    commitdao.h \
+    commitmodel.h \
+    gitmanager.h
+
+OTHER_FILES += \
+    main.qml
 
 RESOURCES += \
     gitscope.qrc
