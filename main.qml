@@ -15,6 +15,8 @@ ApplicationWindow {
     Component {
         id: commitDelegate
         Item {
+            property string commitHash: hash
+
             width: parent.width - 1
             height: listItemHeight
 
@@ -86,6 +88,10 @@ ApplicationWindow {
                             damping: 0.2
                         }
                     }
+                }
+
+                onCurrentItemChanged: {
+                    console.log(currentItem.commitHash);
                 }
             }
         }

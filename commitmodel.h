@@ -13,7 +13,7 @@ class CommitModel : public QAbstractListModel
 public:
 
     enum Roles {
-        IdRole = Qt::UserRole + 1,
+        HashRole = Qt::UserRole + 1, // Id
         SummaryRole,
         AuthorNameRole,
         AuthorEmailRole,

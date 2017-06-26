@@ -31,10 +31,10 @@ QList<Commit *> CommitDao::getCommits() const
     return commits;
 }
 
-QString CommitDao::getSummary(const QString &oidString) const
+QString CommitDao::getSummary(const QString &hash) const
 {
     git_oid oid;
-    git_oid_fromstr(&oid, oidString.toStdString().c_str());
+    git_oid_fromstr(&oid, hash.toStdString().c_str());
 
     git_commit *commit = nullptr;
     git_commit_lookup(&commit, m_repository, &oid);
@@ -42,12 +42,12 @@ QString CommitDao::getSummary(const QString &oidString) const
     return QString(git_commit_summary(commit));
 }
 
-QMap<int, QString> CommitDao::getAuthor(const QString &oidString) const
+QMap<int, QString> CommitDao::getAuthor(const QString &hash) const
 {
     QMap<int, QString> author;
 
     git_oid oid;
-    git_oid_fromstr(&oid, oidString.toStdString().c_str());
+    git_oid_fromstr(&oid, hash.toStdString().c_str());
 
     git_commit *commit = nullptr;
     git_commit_lookup(&commit, m_repository, &oid);
@@ -59,10 +59,10 @@ QMap<int, QString> CommitDao::getAuthor(const QString &oidString) const
     return author;
 }
 
-QDateTime CommitDao::getTime(const QString &oidString) const
+QDateTime CommitDao::getTime(const QString &hash) const
 {
     git_oid oid;
-    git_oid_fromstr(&oid, oidString.toStdString().c_str());
+    git_oid_fromstr(&oid, hash.toStdString().c_str());
 
     git_commit *commit = nullptr;
     git_commit_lookup(&commit, m_repository, &oid);

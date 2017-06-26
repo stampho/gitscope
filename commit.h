@@ -14,9 +14,9 @@ public:
         Email,
     };
 
-    explicit Commit(const CommitDao *dao, QString oid = "");
+    explicit Commit(const CommitDao *dao, QString hash = "");
 
-    QString oid() const;
+    QString hash() const;
     QString summary();
     QString author(AuthorInfo);
     QString time();
@@ -24,7 +24,7 @@ public:
 private:
     const CommitDao *m_dao;
 
-    QString m_oid;
+    QString m_hash;
     QString m_summary;
     QMap<int, QString> m_author;
     QString m_time;

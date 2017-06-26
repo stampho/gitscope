@@ -15,9 +15,9 @@ public:
 
     QList<Commit *> getCommits() const;
 
-    QString getSummary(const QString &oidString) const;
-    QMap<int, QString> getAuthor(const QString &idString) const;
-    QDateTime getTime(const QString &oidString) const;
+    QString getSummary(const QString &hash) const;
+    QMap<int, QString> getAuthor(const QString &hash) const;
+    QDateTime getTime(const QString &hash) const;
 
 private:
     git_repository *m_repository;

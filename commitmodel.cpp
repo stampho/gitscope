@@ -22,8 +22,8 @@ QVariant CommitModel::data(const QModelIndex &index, int role) const
 
     Commit *commit = m_commits[index.row()];
     switch (role) {
-    case Roles::IdRole:
-        return commit->oid();
+    case Roles::HashRole:
+        return commit->hash();
     case Roles::SummaryRole:
     case Qt::DisplayRole:
         return commit->summary();
@@ -42,7 +42,7 @@ QVariant CommitModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> CommitModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[Roles::IdRole] = "oid";
+    roles[Roles::HashRole] = "hash";
     roles[Roles::SummaryRole] = "summary";
     roles[Roles::AuthorNameRole] = "authorName";
     roles[Roles::AuthorEmailRole] = "authorEmail";
