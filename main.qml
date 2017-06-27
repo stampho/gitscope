@@ -2,6 +2,8 @@ import QtQuick 2.6
 import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.1
 
+import GitScope 1.0
+
 ApplicationWindow {
     id: window
     visible: true
@@ -11,6 +13,19 @@ ApplicationWindow {
     title: "GitScope"
 
     property int listItemHeight: 50
+
+    Connections {
+        target: commitListView
+        onSelected: {
+            var commit = commitModel.getCommit(hash);
+            console.log("commit " + commit.hash);
+            console.log("Author: " + commit.authorName + " <" + commit.authorEmail + ">");
+            console.log("Date:   " + commit.time);
+            console.log("")
+            console.log("    " + commit.summary);
+            console.log("");
+        }
+    }
 
     Component {
         id: commitDelegate
@@ -69,6 +84,8 @@ ApplicationWindow {
                 id: commitListView
                 anchors.fill: parent
 
+                signal selected(var hash)
+
                 model: commitModel
                 delegate: commitDelegate
                 focus: true
@@ -90,9 +107,7 @@ ApplicationWindow {
                     }
                 }
 
-                onCurrentItemChanged: {
-                    console.log(currentItem.commitHash);
-                }
+                onCurrentItemChanged: selected(currentItem.commitHash);
             }
         }
         Rectangle {

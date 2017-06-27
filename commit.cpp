@@ -1,8 +1,9 @@
 #include "commit.h"
 #include "commitdao.h"
 
-Commit::Commit(const CommitDao *dao, QString hash)
-    : m_dao(dao)
+Commit::Commit(const CommitDao *dao, QString hash, QObject *parent)
+    : QObject(parent)
+    , m_dao(dao)
     , m_hash(hash)
 {
 }
@@ -19,11 +20,18 @@ QString Commit::summary()
     return m_summary;
 }
 
-QString Commit::author(AuthorInfo authorInfo)
+QString Commit::authorName()
 {
     if (m_author.isEmpty())
         m_author.unite(m_dao->getAuthor(hash()));
-    return m_author[authorInfo];
+    return m_author[AuthorInfo::Name];
+}
+
+QString Commit::authorEmail()
+{
+    if (m_author.isEmpty())
+        m_author.unite(m_dao->getAuthor(hash()));
+    return m_author[AuthorInfo::Email];
 }
 
 QString Commit::time()

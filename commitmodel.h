@@ -26,6 +26,8 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
+    Q_INVOKABLE Commit *getCommit(const QString &hash);
+
 private:
     bool isIndexValid(const QModelIndex &index) const;
 

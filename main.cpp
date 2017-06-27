@@ -10,6 +10,8 @@ int main(int argc, char *argv[])
 
     CommitModel commitModel;
 
+    qmlRegisterUncreatableType<Commit>("GitScope", 1, 0, "Commit", QGuiApplication::tr("Cannot instantiate \"Commit\" in QML!"));
+
     QQmlApplicationEngine engine;
     QQmlContext *context = engine.rootContext();
 

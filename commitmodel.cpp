@@ -28,9 +28,9 @@ QVariant CommitModel::data(const QModelIndex &index, int role) const
     case Qt::DisplayRole:
         return commit->summary();
     case Roles::AuthorNameRole:
-        return commit->author(Commit::Name);
+        return commit->authorName();
     case Roles::AuthorEmailRole:
-        return commit->author(Commit::Email);
+        return commit->authorEmail();
     case Roles::TimeRole:
         return commit->time();
 
@@ -53,4 +53,14 @@ QHash<int, QByteArray> CommitModel::roleNames() const
 bool CommitModel::isIndexValid(const QModelIndex &index) const
 {
     return index.row() >= 0 && index.row() < rowCount();
+}
+
+Commit *CommitModel::getCommit(const QString &hash)
+{
+    for (Commit *commit : m_commits) {
+        if (commit->hash() == hash)
+            return commit;
+    }
+
+    return nullptr;
 }
