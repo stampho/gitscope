@@ -16,7 +16,7 @@ QString Commit::hash() const
 QString Commit::summary()
 {
     if (m_summary.isEmpty())
-        m_summary = QString(m_dao->getSummary(hash()));
+        m_summary = m_dao->getSummary(hash());
     return m_summary;
 }
 
