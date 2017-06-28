@@ -24,6 +24,8 @@ ApplicationWindow {
             console.log("")
             console.log("    " + commit.summary);
             console.log("");
+            console.log(commit.diff);
+            console.log("");
         }
     }
 

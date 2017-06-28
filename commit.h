@@ -15,6 +15,7 @@ class Commit : public QObject
     Q_PROPERTY(QString authorName READ authorName CONSTANT FINAL)
     Q_PROPERTY(QString authorEmail READ authorEmail CONSTANT FINAL)
     Q_PROPERTY(QString time READ time CONSTANT FINAL)
+    Q_PROPERTY(QString diff READ diff CONSTANT FINAL)
 
 public:
     enum AuthorInfo {
@@ -29,6 +30,7 @@ public:
     QString authorName();
     QString authorEmail();
     QString time();
+    QString diff();
 
 private:
     const CommitDao *m_dao;
@@ -37,6 +39,7 @@ private:
     QString m_summary;
     QMap<int, QString> m_author;
     QString m_time;
+    QString m_diff;
 };
 
 #endif // COMMIT_H

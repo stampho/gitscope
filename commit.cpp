@@ -40,3 +40,10 @@ QString Commit::time()
         m_time = m_dao->getTime(hash()).toString();
     return m_time;
 }
+
+QString Commit::diff()
+{
+    if (m_diff.isEmpty())
+        m_diff = m_dao->getDiff(hash());
+    return m_diff;
+}
