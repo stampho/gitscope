@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import QtQuick.Controls 2.1
+import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
 
 import GitScope 1.0
@@ -24,8 +24,8 @@ ApplicationWindow {
             console.log("")
             console.log("    " + commit.summary);
             console.log("");
-            console.log(commit.diff);
-            console.log("");
+            // FIXME(pvarga): This is unstable
+            diffView.text = commit.diff;
         }
     }
 
@@ -116,6 +116,19 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             color: "white"
+
+            TextArea {
+                id: diffView
+                anchors.fill: parent
+
+                Component.onCompleted: {
+                    // WORKAROUND: commitListView.selected signal is emmitted earlier
+                    // than the corresponding Connections is created
+                    var hash = commitListView.currentItem.commitHash;
+                    var commit = commitModel.getCommit(hash);
+                    diffView.text = commit.diff;
+                }
+            }
         }
     }
 }
