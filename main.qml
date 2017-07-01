@@ -23,7 +23,7 @@ ApplicationWindow {
             console.log("Author: " + commit.authorName + " <" + commit.authorEmail + ">");
             console.log("Date:   " + commit.time);
             console.log("")
-            console.log("    " + commit.summary);
+            console.log("    " + commit.message);
             console.log("");
 
             diffView.text = commit.diff;

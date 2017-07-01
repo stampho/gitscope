@@ -12,6 +12,7 @@ class Commit : public QObject
     Q_OBJECT
     Q_PROPERTY(QString hash READ hash CONSTANT FINAL)
     Q_PROPERTY(QString summary READ summary CONSTANT FINAL)
+    Q_PROPERTY(QString message READ message CONSTANT FINAL)
     Q_PROPERTY(QString authorName READ authorName CONSTANT FINAL)
     Q_PROPERTY(QString authorEmail READ authorEmail CONSTANT FINAL)
     Q_PROPERTY(QString time READ time CONSTANT FINAL)
@@ -27,6 +28,7 @@ public:
 
     QString hash() const;
     QString summary();
+    QString message();
     QString authorName();
     QString authorEmail();
     QString time();
@@ -37,6 +39,7 @@ private:
 
     QString m_hash;
     QString m_summary;
+    QString m_message;
     QMap<int, QString> m_author;
     QString m_time;
     QString m_diff;

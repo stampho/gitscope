@@ -20,6 +20,13 @@ QString Commit::summary()
     return m_summary;
 }
 
+QString Commit::message()
+{
+    if (m_message.isEmpty())
+        m_message = m_dao->getMessage(hash());
+    return m_message;
+}
+
 QString Commit::authorName()
 {
     if (m_author.isEmpty())

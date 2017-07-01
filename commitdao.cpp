@@ -42,6 +42,17 @@ QString CommitDao::getSummary(const QString &hash) const
     return QString(git_commit_summary(commit));
 }
 
+QString CommitDao::getMessage(const QString &hash) const
+{
+    git_oid oid;
+    git_oid_fromstr(&oid, hash.toStdString().c_str());
+
+    git_commit *commit = nullptr;
+    git_commit_lookup(&commit, m_repository, &oid);
+
+    return QString(git_commit_message(commit));
+}
+
 QMap<int, QString> CommitDao::getAuthor(const QString &hash) const
 {
     QMap<int, QString> author;
