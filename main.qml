@@ -33,8 +33,30 @@ ApplicationWindow {
     function commitContent(commit) {
         var text = "";
 
-        text += "<pre>";
-        text += commit.diff;
+        text += "<pre style='color:#999999'>";
+        var lines = commit.diff.split('\n');
+        for (var i = 0; i < lines.length; ++i) {
+            var line = lines[i];
+            line = line.replace(/</g, "&lt;");
+            line = line.replace(/>/g, "&gt;");
+
+            if (line.startsWith("diff --git") ||
+                    line.startsWith("index ") ||
+                    line.startsWith("--- ") ||
+                    line.startsWith("+++ ") ||
+                    line.startsWith("new file mode")) {
+                line = "<font color='#000000'>" + line + "</font>";
+            } else if (line.startsWith("-")) {
+                line = "<font color='#ff0000'>" + line + "</font>";
+            } else if (line.startsWith("+")) {
+                line = "<font color='#008000'>" + line + "</font>";
+            } else if (line.startsWith("@@ ")) {
+                var parts = line.match("(@@.*?@@)(.*)");
+                line = "<font color='#00a0a0'>" + parts[1] + "</font>"+ parts[2];
+            }
+
+            text += line + "\n";
+        }
         text += "</pre>";
 
         return text;
