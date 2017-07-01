@@ -10,8 +10,9 @@ struct git_repository;
 class CommitDao
 {
 public:
-    CommitDao(git_repository *repository);
+    CommitDao();
 
+    void setRepository(git_repository *repository);
     QStringList getCommitHashList() const;
 
     QString getSummary(const QString &hash) const;

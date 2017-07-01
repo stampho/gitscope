@@ -1,29 +1,18 @@
 #include <git2.h>
 
 #include "commitdao.h"
+#include "commitmodel.h"
 #include "gitmanager.h"
 
-GitManager &GitManager::instance()
-{
-    static GitManager singleton;
-    return singleton;
-}
-
-GitManager::GitManager(const QString &path)
-    : m_repository(nullptr)
-    , m_commitDao(nullptr)
+GitManager::GitManager(QObject *parent)
+    : QObject(parent)
+    , m_repository(nullptr)
+    , m_commitDao(new CommitDao)
+    , m_commitModel(new CommitModel)
 {
     git_libgit2_init();
 
-    int error = git_repository_open(&m_repository, path.toStdString().c_str());
-    // TODO(pvarga): Add proper error handling
-    if (error) {
-        fprintf(stderr, "error: %d\n", error);
-        exit(1);
-    }
-
-    Q_ASSERT(m_repository);
-    m_commitDao.reset(new CommitDao(m_repository));
+    connect(this, &GitManager::repositoryPathChanged, this, &GitManager::reset);
 }
 
 GitManager::~GitManager()
@@ -32,8 +21,30 @@ GitManager::~GitManager()
     git_libgit2_shutdown();
 }
 
-CommitDao *GitManager::commitDao() const
+void GitManager::reset()
 {
-    Q_ASSERT(!m_commitDao.isNull());
-    return m_commitDao.data();
+    if (m_repository)
+        git_repository_free(m_repository);
+
+    int errorCode = git_repository_open(&m_repository, m_repositoryPath.toStdString().c_str());
+    m_commitDao->setRepository(m_repository);
+    m_commitModel->reset(m_commitDao.data());
+    emit initialized(errorCode);
+}
+
+CommitModel *GitManager::commitModel()
+{
+    Q_ASSERT(!m_commitModel.isNull());
+    return m_commitModel.data();
+}
+
+QString GitManager::repositoryPath() const
+{
+    return m_repositoryPath;
+}
+
+void GitManager::setRepositoryPath(const QString &repositoryPath)
+{
+    m_repositoryPath = repositoryPath;
+    emit repositoryPathChanged();
 }

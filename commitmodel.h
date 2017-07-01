@@ -4,8 +4,8 @@
 #include <QAbstractListModel>
 #include <QHash>
 
-#include "commit.h"
-#include "gitmanager.h"
+class Commit;
+class CommitDao;
 
 class CommitModel : public QAbstractListModel
 {
@@ -21,6 +21,7 @@ public:
     };
 
     CommitModel(QObject *parent = 0);
+    void reset(CommitDao *CommitDao);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -31,7 +32,6 @@ public:
 private:
     bool isIndexValid(const QModelIndex &index) const;
 
-    GitManager &m_git;
     QList<Commit *> m_commits;
 };
 

@@ -3,13 +3,20 @@
 #include "commit.h"
 #include "commitdao.h"
 
-CommitDao::CommitDao(git_repository *repository)
-    : m_repository(repository)
+CommitDao::CommitDao()
 {
+}
+
+void CommitDao::setRepository(git_repository *repository)
+{
+    m_repository = repository;
 }
 
 QStringList CommitDao::getCommitHashList() const
 {
+    if (!m_repository)
+        return QStringList();
+
     QStringList commitHashList;
     git_revwalk *walker = nullptr;
     git_revwalk_new(&walker, m_repository);
@@ -33,6 +40,8 @@ QStringList CommitDao::getCommitHashList() const
 
 QString CommitDao::getSummary(const QString &hash) const
 {
+    Q_ASSERT(m_repository);
+
     git_oid oid;
     git_oid_fromstr(&oid, hash.toStdString().c_str());
 
@@ -44,6 +53,8 @@ QString CommitDao::getSummary(const QString &hash) const
 
 QString CommitDao::getMessage(const QString &hash) const
 {
+    Q_ASSERT(m_repository);
+
     git_oid oid;
     git_oid_fromstr(&oid, hash.toStdString().c_str());
 
@@ -55,6 +66,8 @@ QString CommitDao::getMessage(const QString &hash) const
 
 QMap<int, QString> CommitDao::getAuthor(const QString &hash) const
 {
+    Q_ASSERT(m_repository);
+
     QMap<int, QString> author;
 
     git_oid oid;
@@ -72,6 +85,8 @@ QMap<int, QString> CommitDao::getAuthor(const QString &hash) const
 
 QDateTime CommitDao::getTime(const QString &hash) const
 {
+    Q_ASSERT(m_repository);
+
     git_oid oid;
     git_oid_fromstr(&oid, hash.toStdString().c_str());
 
@@ -84,6 +99,8 @@ QDateTime CommitDao::getTime(const QString &hash) const
 
 QString CommitDao::getDiff(const QString &hash) const
 {
+    Q_ASSERT(m_repository);
+
     git_oid oid;
     git_oid_fromstr(&oid, hash.toStdString().c_str());
 

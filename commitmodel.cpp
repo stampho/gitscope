@@ -4,10 +4,18 @@
 
 CommitModel::CommitModel(QObject *parent)
     : QAbstractListModel(parent)
-    , m_git(GitManager::instance())
 {
-    for (const QString &hash : m_git.commitDao()->getCommitHashList())
-        m_commits.append(new Commit(m_git.commitDao(), hash, this));
+}
+
+void CommitModel::reset(CommitDao *commitDao)
+{
+    beginResetModel();
+
+    m_commits.clear();
+    for (const QString &hash : commitDao->getCommitHashList())
+        m_commits.append(new Commit(commitDao, hash, this));
+
+    endResetModel();
 }
 
 int CommitModel::rowCount(const QModelIndex &parent) const
