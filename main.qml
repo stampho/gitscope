@@ -77,7 +77,7 @@ ApplicationWindow {
         Item {
             property string commitHash: hash
 
-            width: parent.width - 1
+            width: parent.width
             height: listItemHeight
 
             Column {
@@ -115,86 +115,78 @@ ApplicationWindow {
         }
     }
 
-    RowLayout {
+    SplitView {
         anchors.fill: parent
-        Rectangle {
-            Layout.preferredWidth: 400
+        orientation: Qt.Horizontal
+
+        ListView {
+            id: commitListView
+            Layout.minimumWidth: 100
+            width: 400
             Layout.fillHeight: true
-            color: "#eeeeee"
 
-            border.width: 0
-            border.color: "gray"
+            signal selected(var hash)
 
-            ListView {
-                id: commitListView
-                anchors.fill: parent
+            model: commitModel
+            delegate: commitDelegate
+            focus: true
+            spacing: 5
 
-                signal selected(var hash)
+            highlightFollowsCurrentItem: false
+            highlight: Rectangle {
+                width: commitListView.width
+                height: listItemHeight
+                y: commitListView.currentItem.y
+                color: "lightsteelblue";
+                radius: 5
 
-                model: commitModel
-                delegate: commitDelegate
-                focus: true
-                spacing: 5
-
-                highlightFollowsCurrentItem: false
-                highlight: Rectangle {
-                    width: commitListView.width
-                    height: listItemHeight
-                    y: commitListView.currentItem.y
-                    color: "lightsteelblue";
-                    radius: 5
-
-                    Behavior on y {
-                        SpringAnimation {
-                            spring: 5
-                            damping: 0.2
-                        }
+                Behavior on y {
+                    SpringAnimation {
+                        spring: 5
+                        damping: 0.5
                     }
                 }
-
-                onCurrentItemChanged: selected(currentItem.commitHash);
             }
+
+            onCurrentItemChanged: selected(currentItem.commitHash);
         }
 
-        Rectangle {
+        SplitView {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: "#eeeeee"
+            orientation: Qt.Vertical
 
-            ColumnLayout {
-                anchors.fill: parent
+            TextArea {
+                id: commitView
+                Layout.fillWidth: true
+                Layout.minimumHeight: 50
+                height: 200
+                textFormat: TextEdit.RichText
+                readOnly: true;
 
-                TextArea {
-                    id: commitView
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 200
-                    textFormat: TextEdit.RichText
-                    readOnly: true;
+                Component.onCompleted: {
+                    // WORKAROUND: commitListView.selected signal is emmitted earlier
+                    // than the corresponding Connections is created
+                    var hash = commitListView.currentItem.commitHash;
+                    var commit = commitModel.getCommit(hash);
 
-                    Component.onCompleted: {
-                        // WORKAROUND: commitListView.selected signal is emmitted earlier
-                        // than the corresponding Connections is created
-                        var hash = commitListView.currentItem.commitHash;
-                        var commit = commitModel.getCommit(hash);
-
-                        commitView.text = commitHeader(commit);
-                    }
+                    commitView.text = commitHeader(commit);
                 }
+            }
 
-                TextArea {
-                    id: diffView
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    textFormat: TextEdit.RichText
-                    readOnly: true
+            TextArea {
+                id: diffView
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                textFormat: TextEdit.RichText
+                readOnly: true
 
-                    Component.onCompleted: {
-                        // WORKAROUND: commitListView.selected signal is emmitted earlier
-                        // than the corresponding Connections is created
-                        var hash = commitListView.currentItem.commitHash;
-                        var commit = commitModel.getCommit(hash);
-                        diffView.text = commitContent(commit);
-                    }
+                Component.onCompleted: {
+                    // WORKAROUND: commitListView.selected signal is emmitted earlier
+                    // than the corresponding Connections is created
+                    var hash = commitListView.currentItem.commitHash;
+                    var commit = commitModel.getCommit(hash);
+                    diffView.text = commitContent(commit);
                 }
             }
         }
