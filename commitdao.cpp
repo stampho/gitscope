@@ -8,9 +8,9 @@ CommitDao::CommitDao(git_repository *repository)
 {
 }
 
-QList<Commit *> CommitDao::getCommits() const
+QStringList CommitDao::getCommitHashList() const
 {
-    QList<Commit *> commits;
+    QStringList commitHashList;
     git_revwalk *walker = nullptr;
     git_revwalk_new(&walker, m_repository);
     git_revwalk_push_head(walker);
@@ -22,13 +22,13 @@ QList<Commit *> CommitDao::getCommits() const
 
         char buffer[GIT_OID_HEXSZ+1];
         git_oid_tostr(buffer, sizeof(buffer)/sizeof(char), &oid);
-        commits.append(new Commit(this, buffer));
+        commitHashList.append(buffer);
 
         git_commit_free(commit);
     }
 
     git_revwalk_free(walker);
-    return commits;
+    return commitHashList;
 }
 
 QString CommitDao::getSummary(const QString &hash) const

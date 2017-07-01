@@ -5,8 +5,9 @@
 CommitModel::CommitModel(QObject *parent)
     : QAbstractListModel(parent)
     , m_git(GitManager::instance())
-    , m_commits(m_git.commitDao()->getCommits())
 {
+    for (const QString &hash : m_git.commitDao()->getCommitHashList())
+        m_commits.append(new Commit(m_git.commitDao(), hash, this));
 }
 
 int CommitModel::rowCount(const QModelIndex &parent) const

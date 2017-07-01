@@ -6,14 +6,13 @@
 #include <QMap>
 
 struct git_repository;
-class Commit;
 
 class CommitDao
 {
 public:
     CommitDao(git_repository *repository);
 
-    QList<Commit *> getCommits() const;
+    QStringList getCommitHashList() const;
 
     QString getSummary(const QString &hash) const;
     QMap<int, QString> getAuthor(const QString &hash) const;

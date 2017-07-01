@@ -18,13 +18,14 @@ ApplicationWindow {
         target: commitListView
         onSelected: {
             var commit = commitModel.getCommit(hash);
+
             console.log("commit " + commit.hash);
             console.log("Author: " + commit.authorName + " <" + commit.authorEmail + ">");
             console.log("Date:   " + commit.time);
             console.log("")
             console.log("    " + commit.summary);
             console.log("");
-            // FIXME(pvarga): This is unstable
+
             diffView.text = commit.diff;
         }
     }
