@@ -7,26 +7,46 @@ import GitScope 1.0
 ApplicationWindow {
     id: window
     visible: true
-    width: 800
-    height: 600
+    width: 1024
+    height: 768
 
     title: "GitScope"
 
     property int listItemHeight: 50
+
+    function commitHeader(commit) {
+        var text = "";
+
+        text += "<pre>";
+        text += "<font color='#c7c524'>commit " + commit.hash + "</font><br>";
+        text += "Author: " + commit.authorName + " &lt;" + commit.authorEmail + "&gt;<br>";
+        text += "Date:   " + commit.time;
+        text += "</pre>";
+
+        text += "<pre style=\"text-indent:30px\">";
+        text += commit.message;
+        text += "</pre>";
+
+        return text;
+    }
+
+    function commitContent(commit) {
+        var text = "";
+
+        text += "<pre>";
+        text += commit.diff;
+        text += "</pre>";
+
+        return text;
+    }
 
     Connections {
         target: commitListView
         onSelected: {
             var commit = commitModel.getCommit(hash);
 
-            console.log("commit " + commit.hash);
-            console.log("Author: " + commit.authorName + " <" + commit.authorEmail + ">");
-            console.log("Date:   " + commit.time);
-            console.log("")
-            console.log("    " + commit.message);
-            console.log("");
-
-            diffView.text = commit.diff;
+            commitView.text = commitHeader(commit);
+            diffView.text = commitContent(commit);
         }
     }
 
@@ -113,21 +133,46 @@ ApplicationWindow {
                 onCurrentItemChanged: selected(currentItem.commitHash);
             }
         }
+
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: "white"
+            color: "#eeeeee"
 
-            TextArea {
-                id: diffView
+            ColumnLayout {
                 anchors.fill: parent
 
-                Component.onCompleted: {
-                    // WORKAROUND: commitListView.selected signal is emmitted earlier
-                    // than the corresponding Connections is created
-                    var hash = commitListView.currentItem.commitHash;
-                    var commit = commitModel.getCommit(hash);
-                    diffView.text = commit.diff;
+                TextArea {
+                    id: commitView
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 200
+                    textFormat: TextEdit.RichText
+                    readOnly: true;
+
+                    Component.onCompleted: {
+                        // WORKAROUND: commitListView.selected signal is emmitted earlier
+                        // than the corresponding Connections is created
+                        var hash = commitListView.currentItem.commitHash;
+                        var commit = commitModel.getCommit(hash);
+
+                        commitView.text = commitHeader(commit);
+                    }
+                }
+
+                TextArea {
+                    id: diffView
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    textFormat: TextEdit.RichText
+                    readOnly: true
+
+                    Component.onCompleted: {
+                        // WORKAROUND: commitListView.selected signal is emmitted earlier
+                        // than the corresponding Connections is created
+                        var hash = commitListView.currentItem.commitHash;
+                        var commit = commitModel.getCommit(hash);
+                        diffView.text = commitContent(commit);
+                    }
                 }
             }
         }
