@@ -14,6 +14,8 @@ ApplicationWindow {
 
     property int listItemHeight: 50
 
+    SystemPalette { id: palette }
+
     function commitHeader(commit) {
         var text = "";
 
@@ -86,20 +88,20 @@ ApplicationWindow {
                 anchors.verticalCenter: parent.verticalCenter
                 Text {
                     text: summary
-                    color: "black"
+                    color: palette.text
                     font.bold: true
                     elide: Text.ElideRight
                     width: parent.width
                 }
                 Text {
                     text: "<b>Author: </b>" + authorName + " &lt;" + authorEmail + "&gt;"
-                    color: "#444444"
+                    color: palette.shadow
                     elide: Text.ElideRight
                     width: parent.width
                 }
                 Text {
                     text: "<b>Date: </b>" + time
-                    color: "#444444"
+                    color: palette.shadow
                     elide: Text.ElideRight
                     width: parent.width
                 }
@@ -121,36 +123,42 @@ ApplicationWindow {
         anchors.fill: parent
         orientation: Qt.Horizontal
 
-        ListView {
-            id: commitListView
+        Rectangle {
             Layout.minimumWidth: 100
             width: 400
             Layout.fillHeight: true
 
-            signal selected(var hash)
+            color: palette.window
 
-            model: commitModel
-            delegate: commitDelegate
-            focus: true
-            spacing: 5
+            ListView {
+                id: commitListView
+                anchors.fill: parent
 
-            highlightFollowsCurrentItem: false
-            highlight: Rectangle {
-                width: commitListView.width
-                height: listItemHeight
-                y: commitListView.currentItem.y
-                color: "lightsteelblue";
-                radius: 5
+                signal selected(var hash)
 
-                Behavior on y {
-                    SpringAnimation {
-                        spring: 5
-                        damping: 0.5
+                model: commitModel
+                delegate: commitDelegate
+                focus: true
+                spacing: 5
+
+                highlightFollowsCurrentItem: false
+                highlight: Rectangle {
+                    width: commitListView.width
+                    height: listItemHeight
+                    y: commitListView.currentItem.y
+                    color: palette.highlight
+                    radius: 5
+
+                    Behavior on y {
+                        SpringAnimation {
+                            spring: 5
+                            damping: 0.5
+                        }
                     }
                 }
-            }
 
-            onCurrentItemChanged: selected(currentItem.commitHash);
+                onCurrentItemChanged: selected(currentItem.commitHash);
+            }
         }
 
         SplitView {
