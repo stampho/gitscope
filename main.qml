@@ -44,7 +44,8 @@ ApplicationWindow {
                     line.startsWith("index ") ||
                     line.startsWith("--- ") ||
                     line.startsWith("+++ ") ||
-                    line.startsWith("new file mode")) {
+                    line.startsWith("new file mode") ||
+                    line.startsWith("deleted file mode")) {
                 line = "<font color='#000000'>" + line + "</font>";
             } else if (line.startsWith("-")) {
                 line = "<font color='#ff0000'>" + line + "</font>";
