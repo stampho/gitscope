@@ -110,6 +110,7 @@ ApplicationWindow {
                     if (index == commitListView.currentIndex)
                         return;
                     commitListView.currentIndex = index;
+                    commitListView.forceActiveFocus();
                 }
             }
         }
@@ -164,6 +165,11 @@ ApplicationWindow {
                 textFormat: TextEdit.RichText
                 readOnly: true;
 
+                onFocusChanged: {
+                    if (focus)
+                        commitListView.forceActiveFocus();
+                }
+
                 Component.onCompleted: {
                     // WORKAROUND: commitListView.selected signal is emmitted earlier
                     // than the corresponding Connections is created
@@ -180,6 +186,11 @@ ApplicationWindow {
                 Layout.fillHeight: true
                 textFormat: TextEdit.RichText
                 readOnly: true
+
+                onFocusChanged: {
+                    if (focus)
+                        commitListView.forceActiveFocus();
+                }
 
                 Component.onCompleted: {
                     // WORKAROUND: commitListView.selected signal is emmitted earlier
