@@ -1,3 +1,4 @@
+import Qt.labs.settings 1.0
 import QtQuick 2.6
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
@@ -18,6 +19,17 @@ ApplicationWindow {
 
     SystemPalette { id: palette }
 
+    Settings {
+        id: appSettings
+
+        property alias x: window.x
+        property alias y: window.y
+        property alias width: window.width
+        property alias height: window.height
+
+        property alias repositoryPath: gitManager.repositoryPath
+    }
+
     GitManager {
         id: gitManager
 
@@ -28,8 +40,8 @@ ApplicationWindow {
         }
 
         Component.onCompleted: {
-            // FIXME(pvarga): Set path here to catch the first initialized() signal
-            repositoryPath = "/Users/stampho/work/Qt/qt5-59-src/qtwebengine"
+            // WORKAROUND: Set path here to make possible to catch the first initialized() signal
+            repositoryPath = appSettings.repositoryPath;
         }
     }
 
