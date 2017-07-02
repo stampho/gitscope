@@ -17,6 +17,45 @@ ApplicationWindow {
 
     SystemPalette { id: palette }
 
+    statusBar: StatusBar {
+        id: statusBar
+
+        property var status: gitManager.status
+        property string statusString: ""
+
+        onStatusChanged: {
+            switch(status) {
+            case GitManager.Uninitialized:
+                statusString = "<font color='#ff0000'><b>Uninitialized</b></font>";
+                break;
+            case GitManager.Dirty:
+                statusString = "<font color='#ff0000'><b>Dirty</b></font>";
+                break;
+            case GitManager.Clean:
+                statusString = "<font color='#008000'><b>Clean</b></font>";
+                break;
+            }
+        }
+
+        Row {
+            anchors.fill: parent
+            Label {
+                width: 150
+                text: "<b>Commits: </b>" + commitListView.count + "/" + (commitListView.count - commitListView.currentIndex)
+            }
+
+            Label {
+                width: 150
+                text: "<b>Branch: </b>" + gitManager.branch
+            }
+
+            Label {
+                width: 150
+                text: "<b>Status: </b>" + statusBar.statusString
+            }
+        }
+    }
+
     Settings {
         id: appSettings
 
