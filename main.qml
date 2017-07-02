@@ -1,8 +1,6 @@
 import Qt.labs.settings 1.0
 import QtQuick 2.6
 import QtQuick.Controls 1.4
-import QtQuick.Controls.Styles 1.4
-import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.1
 
 import GitScope 1.0
@@ -28,6 +26,7 @@ ApplicationWindow {
         property alias height: window.height
 
         property alias repositoryPath: gitManager.repositoryPath
+        property alias topPanelState: topPanel.state
     }
 
     GitManager {
@@ -46,12 +45,13 @@ ApplicationWindow {
                 console.log("errorCode: " + errorCode);
             else if (!isReload)
                 commitListView.currentIndex = 0;
-            repositoryInputField.notify(!errorCode);
+            repositoryInputBar.notify(!errorCode);
         }
 
         Component.onCompleted: {
             // WORKAROUND: Set path here to make possible to catch the first initialized() signal
             repositoryPath = appSettings.repositoryPath;
+            repositoryInputBar.repositoryPath = repositoryPath;
         }
     }
 
@@ -166,141 +166,37 @@ ApplicationWindow {
         }
     }
 
-    ColumnLayout {
+    Rectangle {
         anchors.fill: parent
-        anchors.margins: 5
+        anchors.leftMargin: 5
+        anchors.rightMargin: 5
 
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 35
+        color: palette.window
 
-            Text {
-                text: "Repository:"
-            }
+        SliderPanel {
+            id: topPanel
+            orientation: Qt.Horizontal
+            pos: parent.y
+            width: parent.width
+            height: 55
+            anchors.horizontalCenter: parent.horizontalCenter
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 30
+            RepositoryInputBar {
+                id: repositoryInputBar
+                anchors.fill: parent
 
-                color: "white"
-                radius: 4
-
-                TextField {
-                    id: repositoryInputField
-                    anchors.fill: parent
-
-                    function notify(success) {
-                        bgColorChangeAnim.color = success ? "#32cd32" : "#ff6666";
-                        bgColorChangeAnim.start();
-                    }
-
-                    SequentialAnimation {
-                        id: bgColorChangeAnim
-
-                        property color defaultColor: "white"
-                        property color color: "white"
-                        property int duration: 1000
-                        property int easingType: Easing.InOutSine
-
-                        ColorAnimation {
-                            target: repositoryInputField.parent
-                            property: "color"
-
-                            from: bgColorChangeAnim.defaultColor
-                            to: bgColorChangeAnim.color
-                            duration: bgColorChangeAnim.duration / 2
-
-                            easing.type: bgColorChangeAnim.easingType
-                        }
-                        ColorAnimation {
-                            target: repositoryInputField.parent
-                            property: "color"
-
-                            from: bgColorChangeAnim.color
-                            to: bgColorChangeAnim.defaultColor
-                            duration: bgColorChangeAnim.duration / 2
-
-                            easing.type: bgColorChangeAnim.easingType
-                        }
-                    }
-
-                    text: gitManager.repositoryPath
-
-                    style: TextFieldStyle {
-                        padding.left: 10
-
-                        background: Rectangle {
-                            color: "transparent"
-                            border.color: Qt.darker(palette.window, 2.0)
-                            border.width: 1
-                            radius: repositoryInputField.parent.radius
-                        }
-                    }
-
-                    onActiveFocusChanged: activeFocus ? selectAll() : deselect()
-
-                    onAccepted: {
-                        gitManager.repositoryPath = repositoryInputField.text;
-                        repositoryLoadButton.text = "Reload";
-                    }
-
-                    onTextChanged: {
-                        if (text != gitManager.repositoryPath)
-                            repositoryLoadButton.text = "Load";
-                        else
-                            repositoryLoadButton.text = "Reload";
-                    }
-                }
-            }
-
-            Button {
-                id: repositoryLoadButton
-                Layout.preferredWidth: 75
-                Layout.preferredHeight: 30
-
-                text: "Load"
-
-                onClicked: {
-                    gitManager.repositoryPath = repositoryInputField.text;
-                    repositoryLoadButton.text = "Reload";
-                }
-            }
-
-            Button {
-                Layout.preferredWidth: 75
-                Layout.preferredHeight: 30
-
-                text: "Browse"
-
-                onClicked: fileDialog.visible = true;
-
-                FileDialog {
-                    id: fileDialog
-
-                    title: "Choose a folder"
-
-                    selectExisting: true
-                    selectMultiple: false
-                    selectFolder: true
-
-                    folder: shortcuts.home
-
-                    onAccepted: {
-                        var repositoryPath = fileUrl.toString();
-                        var fileScheme = "file://";
-                        if (repositoryPath.toString().startsWith(fileScheme))
-                            repositoryPath = repositoryPath.substring(fileScheme.length);
-                        repositoryInputField.text = repositoryPath;
-                        gitManager.repositoryPath = repositoryInputField.text;
-                        repositoryLoadButton.text = "Reload";
-                    }
+                onLoad: {
+                    gitManager.repositoryPath = repositoryPath
                 }
             }
         }
 
         SplitView {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+            anchors.top: topPanel.bottom
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+
             orientation: Qt.Horizontal
 
             Rectangle {

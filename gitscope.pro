@@ -34,7 +34,9 @@ HEADERS += \
     gitmanager.h
 
 OTHER_FILES += \
-    main.qml
+    main.qml \
+    RepositoryInputBar.qml \
+    SliderPanel.qml
 
 RESOURCES += \
     gitscope.qrc

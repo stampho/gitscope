@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
+        <file>RepositoryInputBar.qml</file>
+        <file>SliderPanel.qml</file>
     </qresource>
 </RCC>
