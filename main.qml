@@ -1,6 +1,7 @@
 import QtQuick 2.6
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
+import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.1
 
 import GitScope 1.0
@@ -240,6 +241,35 @@ ApplicationWindow {
                 onClicked: {
                     gitManager.repositoryPath = repositoryInputField.text;
                     repositoryLoadButton.text = "Reload";
+                }
+            }
+
+            Button {
+                Layout.preferredWidth: 75
+                Layout.preferredHeight: 30
+
+                text: "Browse"
+
+                onClicked: fileDialog.visible = true;
+
+                FileDialog {
+                    id: fileDialog
+
+                    title: "Choose a folder"
+
+                    selectExisting: true
+                    selectMultiple: false
+                    selectFolder: true
+
+                    folder: shortcuts.home
+
+                    onAccepted: {
+                        var repositoryPath = fileUrl.toString();
+                        var fileScheme = "file://";
+                        if (repositoryPath.toString().startsWith(fileScheme))
+                            repositoryPath = repositoryPath.substring(fileScheme.length);
+                        repositoryInputField.text = repositoryPath;
+                    }
                 }
             }
         }
