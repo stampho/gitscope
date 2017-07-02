@@ -33,9 +33,19 @@ ApplicationWindow {
     GitManager {
         id: gitManager
 
+        property bool isReload: false
+        property string previousRepositoryPath: ""
+
+        onRepositoryPathChanged: {
+            isReload = (previousRepositoryPath == repositoryPath);
+            previousRepositoryPath = repositoryPath;
+        }
+
         onInitialized: {
             if (errorCode)
                 console.log("errorCode: " + errorCode);
+            else if (!isReload)
+                commitListView.currentIndex = 0;
             repositoryInputField.notify(!errorCode);
         }
 
