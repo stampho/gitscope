@@ -23,6 +23,7 @@ ApplicationWindow {
         onInitialized: {
             if (errorCode)
                 console.log("errorCode: " + errorCode);
+            repositoryInputField.notify(!errorCode);
         }
 
         Component.onCompleted: {
@@ -156,6 +157,41 @@ ApplicationWindow {
                 TextField {
                     id: repositoryInputField
                     anchors.fill: parent
+
+                    function notify(success) {
+                        bgColorChangeAnim.color = success ? "#32cd32" : "#ff6666";
+                        bgColorChangeAnim.start();
+                    }
+
+                    SequentialAnimation {
+                        id: bgColorChangeAnim
+
+                        property color defaultColor: "white"
+                        property color color: "white"
+                        property int duration: 1000
+                        property int easingType: Easing.InOutSine
+
+                        ColorAnimation {
+                            target: repositoryInputField.parent
+                            property: "color"
+
+                            from: bgColorChangeAnim.defaultColor
+                            to: bgColorChangeAnim.color
+                            duration: bgColorChangeAnim.duration / 2
+
+                            easing.type: bgColorChangeAnim.easingType
+                        }
+                        ColorAnimation {
+                            target: repositoryInputField.parent
+                            property: "color"
+
+                            from: bgColorChangeAnim.color
+                            to: bgColorChangeAnim.defaultColor
+                            duration: bgColorChangeAnim.duration / 2
+
+                            easing.type: bgColorChangeAnim.easingType
+                        }
+                    }
 
                     text: gitManager.repositoryPath
 
