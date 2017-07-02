@@ -91,6 +91,14 @@ ApplicationWindow {
         }
     }
 
+    Connections {
+        target: gitManager.commitModel
+        onModelReset: {
+            diffView.text = "";
+            commitView.text = "";
+        }
+    }
+
     Component {
         id: commitDelegate
         Item {
