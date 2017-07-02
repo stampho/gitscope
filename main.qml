@@ -20,11 +20,10 @@ ApplicationWindow {
     statusBar: StatusBar {
         id: statusBar
 
-        property var status: gitManager.status
         property string statusString: ""
 
-        onStatusChanged: {
-            switch(status) {
+        function update() {
+            switch(gitManager.status) {
             case GitManager.Uninitialized:
                 statusString = "<font color='#ff0000'><b>Uninitialized</b></font>";
                 break;
@@ -35,22 +34,52 @@ ApplicationWindow {
                 statusString = "<font color='#008000'><b>Clean</b></font>";
                 break;
             }
+
+            statusInitialized.visible = !gitManager.errorCode;
+            statusUninitialized.visible = gitManager.errorCode;
         }
 
-        Row {
+        Rectangle {
+            id: statusInitialized
             anchors.fill: parent
-            Label {
-                width: 150
-                text: "<b>Commits: </b>" + commitListView.count + "/" + (commitListView.count - commitListView.currentIndex)
+            anchors.leftMargin: 2
+            anchors.rightMargin: 2
+            color: "transparent"
+
+            Row {
+                anchors.left: parent.left
+                spacing: 20
+
+                Label {
+                    text: "<b>Commits: </b>" + commitListView.count + "/" + (commitListView.count - commitListView.currentIndex)
+                }
+
+                Label {
+                    text: "<b>Branch: </b>" + gitManager.branch
+                }
+
             }
 
             Label {
-                width: 150
-                text: "<b>Branch: </b>" + gitManager.branch
+                anchors.right: parent.right
+                text: "<b>Status: </b>" + statusBar.statusString
+            }
+        }
+
+        Rectangle {
+            id: statusUninitialized
+            anchors.fill: parent
+            anchors.leftMargin: 2
+            anchors.rightMargin: 2
+            color: "transparent"
+
+            Label {
+                anchors.left: parent.left
+                text: "<font color='red'><b>Error: </b></font>" + gitManager.errorMessage + " <font color='red'>(" + gitManager.errorCode + ")</font>"
             }
 
             Label {
-                width: 150
+                anchors.right: parent.right
                 text: "<b>Status: </b>" + statusBar.statusString
             }
         }
@@ -80,10 +109,9 @@ ApplicationWindow {
         }
 
         onInitialized: {
-            if (errorCode)
-                console.log("errorCode: " + errorCode);
-            else if (!isReload)
+            if (!errorCode && !isReload)
                 commitListView.currentIndex = 0;
+            statusBar.update();
             repositoryInputBar.notify(!errorCode);
         }
 

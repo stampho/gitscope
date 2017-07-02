@@ -27,7 +27,7 @@ void GitManager::reset()
     if (m_repository)
         git_repository_free(m_repository);
 
-    int errorCode = git_repository_open(&m_repository, m_repositoryPath.toStdString().c_str());
+    m_errorCode = git_repository_open(&m_repository, m_repositoryPath.toStdString().c_str());
     m_commitDao->setRepository(m_repository);
     m_commitModel->reset(m_commitDao.data());
 
@@ -36,7 +36,12 @@ void GitManager::reset()
     setBranch();
     emit branchChanged();
 
-    emit initialized(errorCode);
+    if (m_errorCode)
+        m_errorMessage = QString(giterr_last()->message);
+    else
+        m_errorMessage.clear();
+
+    emit initialized();
 }
 
 CommitModel *GitManager::commitModel()
@@ -102,4 +107,14 @@ void GitManager::setStatus()
     size_t count = git_status_list_entrycount(statusList);
     m_status = (count == 0) ? Status::Clean : Status::Dirty;
     git_status_list_free(statusList);
+}
+
+int GitManager::errorCode() const
+{
+    return m_errorCode;
+}
+
+QString GitManager::errorMessage() const
+{
+    return m_errorMessage;
 }

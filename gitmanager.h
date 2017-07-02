@@ -16,6 +16,8 @@ class GitManager : public QObject
     Q_PROPERTY(QString repositoryPath READ repositoryPath WRITE setRepositoryPath NOTIFY repositoryPathChanged FINAL)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged FINAL)
     Q_PROPERTY(QString branch READ branch NOTIFY branchChanged FINAL)
+    Q_PROPERTY(int errorCode READ errorCode NOTIFY initialized FINAL)
+    Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY initialized FINAL)
 
 public:
     enum Status {
@@ -33,12 +35,14 @@ public:
     void setRepositoryPath(const QString &repositoryPath);
     QString branch() const;
     Status status() const;
+    int errorCode() const;
+    QString errorMessage() const;
 
 signals:
     void repositoryPathChanged();
-    void initialized(int errorCode);
     void statusChanged();
     void branchChanged();
+    void initialized();
 
 private slots:
     void reset();
@@ -51,6 +55,8 @@ private:
     QString m_repositoryPath;
     Status m_status;
     QString m_branch;
+    int m_errorCode;
+    QString m_errorMessage;
 
     QScopedPointer<CommitDao> m_commitDao;
     QScopedPointer<CommitModel> m_commitModel;
