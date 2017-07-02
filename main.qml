@@ -281,6 +281,8 @@ ApplicationWindow {
                         if (repositoryPath.toString().startsWith(fileScheme))
                             repositoryPath = repositoryPath.substring(fileScheme.length);
                         repositoryInputField.text = repositoryPath;
+                        gitManager.repositoryPath = repositoryInputField.text;
+                        repositoryLoadButton.text = "Reload";
                     }
                 }
             }
