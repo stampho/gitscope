@@ -114,7 +114,9 @@ QString CommitDao::getDiff(const QString &hash) const
     git_commit_tree(&commit_tree, commit);
 
     git_tree *parent_tree = nullptr;
-    git_commit_tree(&parent_tree, parent);
+    // The first commit does not have parent. In this case, create diff to an empty tree
+    if (parent)
+        git_commit_tree(&parent_tree, parent);
 
     git_diff *diff = nullptr;
     git_diff_tree_to_tree(&diff, m_repository, parent_tree, commit_tree, nullptr);
