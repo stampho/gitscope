@@ -170,18 +170,33 @@ ApplicationWindow {
                         }
                     }
 
-                    onAccepted: gitManager.repositoryPath = repositoryInputField.text
                     onActiveFocusChanged: activeFocus ? selectAll() : deselect()
+
+                    onAccepted: {
+                        gitManager.repositoryPath = repositoryInputField.text;
+                        repositoryLoadButton.text = "Reload";
+                    }
+
+                    onTextChanged: {
+                        if (text != gitManager.repositoryPath)
+                            repositoryLoadButton.text = "Load";
+                        else
+                            repositoryLoadButton.text = "Reload";
+                    }
                 }
             }
 
             Button {
+                id: repositoryLoadButton
                 Layout.preferredWidth: 75
                 Layout.preferredHeight: 30
 
                 text: "Load"
 
-                onClicked: gitManager.repositoryPath = repositoryInputField.text;
+                onClicked: {
+                    gitManager.repositoryPath = repositoryInputField.text;
+                    repositoryLoadButton.text = "Reload";
+                }
             }
         }
 
