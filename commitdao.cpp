@@ -4,6 +4,7 @@
 #include "commitdao.h"
 
 CommitDao::CommitDao()
+    : m_repository(nullptr)
 {
 }
 
