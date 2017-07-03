@@ -95,7 +95,11 @@ QDateTime CommitDao::getTime(const QString &hash) const
     git_commit_lookup(&commit, m_repository, &oid);
 
     const git_time_t time = git_commit_time(commit);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
     return QDateTime::fromSecsSinceEpoch(time);
+#else
+    return QDateTime::fromMSecsSinceEpoch(time * 1000);
+#endif
 }
 
 QString CommitDao::getDiff(const QString &hash) const

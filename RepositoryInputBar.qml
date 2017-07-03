@@ -128,7 +128,7 @@ RowLayout {
             onAccepted: {
                 var repositoryPath = fileUrl.toString();
                 var fileScheme = "file://";
-                if (repositoryPath.toString().startsWith(fileScheme))
+                if (repositoryPath.match(fileScheme))
                     repositoryPath = repositoryPath.substring(fileScheme.length);
                 repositoryInputField.text = repositoryPath;
                 root.repositoryPath = repositoryInputField.text;

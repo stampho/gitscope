@@ -148,19 +148,19 @@ ApplicationWindow {
             line = line.replace(/</g, "&lt;");
             line = line.replace(/>/g, "&gt;");
 
-            if (line.startsWith("diff --git") ||
-                    line.startsWith("index ") ||
-                    line.startsWith("--- ") ||
-                    line.startsWith("+++ ") ||
-                    line.startsWith("new file mode") ||
-                    line.startsWith("deleted file mode")) {
+            if (line.match("^diff --git.*$") ||
+                    line.match("^index .*$") ||
+                    line.match("^--- .*$") ||
+                    line.match("^[+]{3} .*$") ||
+                    line.match("^new file mode.*$") ||
+                    line.match("^deleted file mode.*$")) {
                 line = "<font color='#000000'>" + line + "</font>";
-            } else if (line.startsWith("-")) {
+            } else if (line.match("^-.*$")) {
                 line = "<font color='#ff0000'>" + line + "</font>";
-            } else if (line.startsWith("+")) {
+            } else if (line.match("^[+].*$")) {
                 line = "<font color='#008000'>" + line + "</font>";
-            } else if (line.startsWith("@@ ")) {
-                var parts = line.match("(@@.*?@@)(.*)");
+            } else if (line.match("^@@ .*$")) {
+                var parts = line.match("^(@@.*?@@)(.*)$");
                 line = "<font color='#00a0a0'>" + parts[1] + "</font>"+ parts[2];
             }
 
