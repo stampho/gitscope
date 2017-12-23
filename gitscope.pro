@@ -3,7 +3,7 @@ QT += qml quick
 CONFIG += c++11
 
 TARGET = gitscope
-CONFIG -= app_bundle
+#CONFIG -= app_bundle
 
 TEMPLATE = app
 
@@ -34,9 +34,14 @@ HEADERS += \
     gitmanager.h
 
 OTHER_FILES += \
+    CompactLayout.qml \
     main.qml \
     RepositoryInputBar.qml \
-    SliderPanel.qml
+    SliderPanel.qml \
+    TableLayout.qml
 
 RESOURCES += \
     gitscope.qrc
+
+DISTFILES += \
+    MainView.qml

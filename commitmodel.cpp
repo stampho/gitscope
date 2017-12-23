@@ -64,7 +64,7 @@ bool CommitModel::isIndexValid(const QModelIndex &index) const
     return index.row() >= 0 && index.row() < rowCount();
 }
 
-Commit *CommitModel::getCommit(const QString &hash)
+Commit *CommitModel::getCommit(const QString &hash) const
 {
     for (Commit *commit : m_commits) {
         if (commit->hash() == hash)
@@ -72,4 +72,21 @@ Commit *CommitModel::getCommit(const QString &hash)
     }
 
     return nullptr;
+}
+
+QVariantMap CommitModel::get(const int row) const
+{
+    if (row < 0 || row >= rowCount())
+        return QVariantMap();
+
+    QVariantMap result;
+    QModelIndex modelIndex = index(row, 0);
+
+    QHash<int, QByteArray> names = roleNames();
+    for (int key : names.keys()) {
+        QVariant d = data(modelIndex, key);
+        result[names[key]] = d;
+    }
+
+    return result;
 }

@@ -3,5 +3,8 @@
         <file>main.qml</file>
         <file>RepositoryInputBar.qml</file>
         <file>SliderPanel.qml</file>
+        <file>CompactLayout.qml</file>
+        <file>TableLayout.qml</file>
+        <file>MainView.qml</file>
     </qresource>
 </RCC>

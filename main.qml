@@ -14,8 +14,78 @@ ApplicationWindow {
     title: "GitScope"
 
     property int listItemHeight: 50
+    property Item mainView: null
+
+    StateGroup {
+        id: viewMode
+
+        state: appSettings.viewMode
+        states: [
+            State {
+                name: "compact"
+            },
+            State {
+                name: "table"
+            }
+        ]
+
+        onStateChanged: {
+            var currentCommitIndex = 0;
+            if (mainView) {
+                currentCommitIndex = mainView.currentCommitIndex;
+                mainView.visible = false;
+            }
+
+            if (state == "compact")
+                mainView = compactView
+            else if (state == "table")
+                mainView = tableView
+            else
+                console.error("Switched to an unknown view mode!");
+
+            mainView.currentCommitIndex = currentCommitIndex;
+            mainView.visible = true;
+            mainView.focus = true;
+        }
+
+        Component.onCompleted: {
+            if (!state)
+                state = "compact";
+        }
+    }
 
     SystemPalette { id: palette }
+
+    menuBar: MenuBar {
+        Menu {
+            title: "Window"
+            ExclusiveGroup { id: viewGroup }
+
+            Menu {
+                title: "Views"
+
+                MenuItem {
+                    text: "Compact"
+                    checkable: true
+                    checked: viewMode.state == "compact"
+                    exclusiveGroup: viewGroup
+                    onTriggered: {
+                        viewMode.state = "compact";
+                    }
+                }
+
+                MenuItem {
+                    text: "Table"
+                    checkable: true
+                    checked: viewMode.state == "table"
+                    exclusiveGroup: viewGroup
+                    onTriggered: {
+                        viewMode.state = "table";
+                    }
+                }
+            }
+        }
+    }
 
     statusBar: StatusBar {
         id: statusBar
@@ -51,7 +121,7 @@ ApplicationWindow {
                 spacing: 20
 
                 Label {
-                    text: "<b>Commits: </b>" + commitListView.count + "/" + (commitListView.count - commitListView.currentIndex)
+                    text: "<b>Commits: </b>" + mainView.commitCount + "/" + (mainView.commitCount - mainView.currentCommitIndex)
                 }
 
                 Label {
@@ -95,6 +165,7 @@ ApplicationWindow {
 
         property alias repositoryPath: gitManager.repositoryPath
         property alias topPanelState: topPanel.state
+        property alias viewMode: viewMode.state
     }
 
     GitManager {
@@ -109,8 +180,12 @@ ApplicationWindow {
         }
 
         onInitialized: {
-            if (!errorCode && !isReload)
-                commitListView.currentIndex = 0;
+            if (!isReload && mainView) {
+                mainView.reset();
+                if (!errorCode)
+                    mainView.update();
+            }
+
             statusBar.update();
             repositoryInputBar.notify(!errorCode);
         }
@@ -122,116 +197,6 @@ ApplicationWindow {
         }
     }
 
-    function commitHeader(commit) {
-        var text = "";
-
-        text += "<pre>";
-        text += "<font color='#c7c524'>commit " + commit.hash + "</font><br>";
-        text += "Author: " + commit.authorName + " &lt;" + commit.authorEmail + "&gt;<br>";
-        text += "Date:   " + commit.time;
-        text += "</pre>";
-
-        text += "<pre style=\"text-indent:30px\">";
-        text += commit.message;
-        text += "</pre>";
-
-        return text;
-    }
-
-    function commitContent(commit) {
-        var text = "";
-
-        text += "<pre style='color:#999999'>";
-        var lines = commit.diff.split('\n');
-        for (var i = 0; i < lines.length; ++i) {
-            var line = lines[i];
-            line = line.replace(/</g, "&lt;");
-            line = line.replace(/>/g, "&gt;");
-
-            if (line.match("^diff --git.*$") ||
-                    line.match("^index .*$") ||
-                    line.match("^--- .*$") ||
-                    line.match("^[+]{3} .*$") ||
-                    line.match("^new file mode.*$") ||
-                    line.match("^deleted file mode.*$")) {
-                line = "<font color='#000000'>" + line + "</font>";
-            } else if (line.match("^-.*$")) {
-                line = "<font color='#ff0000'>" + line + "</font>";
-            } else if (line.match("^[+].*$")) {
-                line = "<font color='#008000'>" + line + "</font>";
-            } else if (line.match("^@@ .*$")) {
-                var parts = line.match("^(@@.*?@@)(.*)$");
-                line = "<font color='#00a0a0'>" + parts[1] + "</font>"+ parts[2];
-            }
-
-            text += line + "\n";
-        }
-        text += "</pre>";
-
-        return text;
-    }
-
-    Connections {
-        target: commitListView
-        onSelected: {
-            var commit = gitManager.commitModel.getCommit(hash);
-
-            commitView.text = commitHeader(commit);
-            diffView.text = commitContent(commit);
-        }
-    }
-
-    Connections {
-        target: gitManager.commitModel
-        onModelReset: {
-            diffView.text = "";
-            commitView.text = "";
-        }
-    }
-
-    Component {
-        id: commitDelegate
-        Item {
-            property string commitHash: hash
-
-            width: parent.width
-            height: listItemHeight
-
-            Column {
-                width: parent.width
-                anchors.verticalCenter: parent.verticalCenter
-                Text {
-                    text: summary
-                    color: palette.text
-                    font.bold: true
-                    elide: Text.ElideRight
-                    width: parent.width
-                }
-                Text {
-                    text: "<b>Author: </b>" + authorName + " &lt;" + authorEmail + "&gt;"
-                    color: palette.shadow
-                    elide: Text.ElideRight
-                    width: parent.width
-                }
-                Text {
-                    text: "<b>Date: </b>" + time
-                    color: palette.shadow
-                    elide: Text.ElideRight
-                    width: parent.width
-                }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    if (index == commitListView.currentIndex)
-                        return;
-                    commitListView.currentIndex = index;
-                    commitListView.forceActiveFocus();
-                }
-            }
-        }
-    }
 
     Rectangle {
         anchors.fill: parent
@@ -253,111 +218,32 @@ ApplicationWindow {
                 anchors.fill: parent
 
                 onLoad: {
-                    gitManager.repositoryPath = repositoryPath
+                    gitManager.repositoryPath = repositoryPath;
+                    mainView.focus = true;
                 }
             }
         }
 
-        SplitView {
+        Item {
             anchors.top: topPanel.bottom
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
 
-            orientation: Qt.Horizontal
+            CompactLayout {
+                id: compactView
+                anchors.fill: parent
+                visible: false
 
-            Rectangle {
-                Layout.minimumWidth: 100
-                width: 400
-                Layout.fillHeight: true
-
-                color: palette.window
-
-                ListView {
-                    id: commitListView
-                    anchors.fill: parent
-
-                    signal selected(var hash)
-
-                    model: gitManager.commitModel
-                    delegate: commitDelegate
-                    focus: true
-                    spacing: 5
-
-                    highlightFollowsCurrentItem: false
-                    highlight: Rectangle {
-                        width: commitListView.width
-                        height: listItemHeight
-                        y: commitListView.currentItem.y
-                        color: palette.highlight
-                        radius: 5
-
-                        Behavior on y {
-                            SpringAnimation {
-                                spring: 5
-                                damping: 0.5
-                            }
-                        }
-                    }
-
-                    onCurrentItemChanged: selected(currentItem.commitHash);
-                }
+                commitModel: gitManager.commitModel
             }
 
-            SplitView {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                orientation: Qt.Vertical
+            TableLayout {
+                id: tableView
+                anchors.fill: parent
+                visible: false
 
-                TextArea {
-                    id: commitView
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: 50
-                    height: 200
-                    textFormat: TextEdit.RichText
-                    readOnly: true;
-
-                    onFocusChanged: {
-                        if (focus)
-                            commitListView.forceActiveFocus();
-                    }
-
-                    Component.onCompleted: {
-                        if (commitListView.currentIndex == -1)
-                            return;
-
-                        // WORKAROUND: commitListView.selected signal is emmitted earlier
-                        // than the corresponding Connections is created
-                        var hash = commitListView.currentItem.commitHash;
-                        var commit = gitManager.commitModel.getCommit(hash);
-
-                        commitView.text = commitHeader(commit);
-                    }
-                }
-
-                TextArea {
-                    id: diffView
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    textFormat: TextEdit.RichText
-                    readOnly: true
-
-                    onFocusChanged: {
-                        if (focus)
-                            commitListView.forceActiveFocus();
-                    }
-
-                    Component.onCompleted: {
-                        if (commitListView.currentIndex == -1)
-                            return;
-
-                        // WORKAROUND: commitListView.selected signal is emmitted earlier
-                        // than the corresponding Connections is created
-                        var hash = commitListView.currentItem.commitHash;
-                        var commit = gitManager.commitModel.getCommit(hash);
-                        diffView.text = commitContent(commit);
-                    }
-                }
+                commitModel: gitManager.commitModel
             }
         }
     }
